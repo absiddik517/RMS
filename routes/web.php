@@ -8,6 +8,8 @@ use App\Http\Controllers\AutocompleteController;
 use App\Http\Controllers\Admin\Gate\RoleController;
 use App\Http\Controllers\Gate\PermissionController;
 
+use App\Http\Controllers\Gate\PdfController;
+
 use App\Http\Controllers\Academic\InstituteController;
 use App\Http\Controllers\Academic\ClassesController;
 use App\Http\Controllers\Academic\SubjectController;
