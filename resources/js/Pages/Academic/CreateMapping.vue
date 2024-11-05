@@ -49,10 +49,12 @@
                     group-class="col-12"
                     type="number"
                   />
-                  <div v-for="(cri, ind) in form.mappings[index].criteria">
-                    <div class="row criborder">
-                      <div @click="removeCriteria(index, ind)" v-show="form.mappings[index].criteria.length > 1" class="farmbtn"><i
-                      class="fa fa-times"></i></div>
+                  <div v-for="(cri, ind) in form.mappings[index].criteria"
+                  :key="'oofrow'+ind">
+                    <div class="row criborder" :key="'keyof'+ind">
+                      <div :key="'keyofbtn'+ind" @click="removeCriteria(index, ind)" v-show="form.mappings[index].criteria.length > 1" class="farmbtn">
+                        <i class="fa fa-times"></i>
+                      </div>
                       <Input
                         v-model="cri.title"
                         :field="'mappings.'+ index +'.criteria.' + ind + '.title'"

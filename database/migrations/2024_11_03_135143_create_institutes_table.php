@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('language');
             $table->string('name');
-            $table->integer('established_at');
+            $table->string('established_at');
             $table->string('address');
             $table->string('logo')->nullable();
             $table->timestamps();

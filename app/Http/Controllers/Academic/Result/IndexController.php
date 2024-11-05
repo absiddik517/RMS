@@ -109,6 +109,9 @@ class IndexController extends Controller
                          ->where('class_id', $req->class_id)
                          ->where('subject_id', $req->subject_id)
                          ->first();
+      if(!$subject_mapings){
+        return response('Error message from controller', 500);
+      }                   
       $results = Result::select(['id','total_mark_obtain', 'status', 'result', 'point', 'grade', 'student_id'])
                          ->where('exam_id', $req->exam_id)
                          ->where('class_id', $req->class_id)

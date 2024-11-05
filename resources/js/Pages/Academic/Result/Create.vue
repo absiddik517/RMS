@@ -17,7 +17,7 @@
           <Select 
             v-model="form.subject_id" 
             label-text="Subject" 
-            from="sheet.get.subject" 
+            from="result.get.subject" 
             :depend-on="{class_id: form.class_id}"
             @change="getForm"/>
           <div class="row">
@@ -159,8 +159,11 @@ export default {
         this.form.results = response.data;
         this.loaded = true;
         console.log(response)
-      } catch (error) {
-        console.log('Error on getSubjects', error);
+      } catch ({ message }) {
+        toast.add({
+          type: 'error',
+          message
+        })
       } finally {
         this.loading = false;
       }

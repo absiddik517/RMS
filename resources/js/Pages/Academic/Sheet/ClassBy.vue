@@ -5,7 +5,10 @@
         <Card varient="gray" body-class="p-0" title="Sheet" :loading="loading">
           <template #title_right>
             <Button @click="printSheet"><i class="fa fa-print"></i></Button>
-            &nbsp;<Button @click="genPDF">PDF</Button>
+            &nbsp;
+            <a :href="route('resultsheet', filter)">
+              <i class="fa fa-print"></i> Pdf
+            </a>
           </template>
           <div class="row p-2 gy-2">
             <Select
@@ -121,7 +124,6 @@ import toast from "@/Store/toast.js";
 import { Inertia } from "@inertiajs/inertia";
 import { reactive, ref } from "vue";
 import jsPDF from "jspdf";
-import "../../../Components/Fonts/SolaimanLipi.js";
 
 export default {
   name: "ClassBy",

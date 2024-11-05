@@ -161,7 +161,6 @@
           field="established_at"
           label="Established At"
           :form="form"
-          type="number"
         />
         <Input
           v-model="form.address"

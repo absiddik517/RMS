@@ -8,7 +8,7 @@ use App\Http\Controllers\AutocompleteController;
 use App\Http\Controllers\Admin\Gate\RoleController;
 use App\Http\Controllers\Gate\PermissionController;
 
-use App\Http\Controllers\Gate\PdfController;
+use App\Http\Controllers\PdfController;
 
 use App\Http\Controllers\Academic\InstituteController;
 use App\Http\Controllers\Academic\ClassesController;
@@ -18,6 +18,9 @@ use App\Http\Controllers\Academic\SubjectMappingController;
 use App\Http\Controllers\Academic\StudentController;
 use App\Http\Controllers\Academic\Result\IndexController;
 use App\Http\Controllers\Academic\Result\ResultController;
+
+use App\Http\Controllers\Pdf\MarksheetController;
+use App\Http\Controllers\Pdf\ResultsheetController;
 
 use App\Http\Controllers\Company\SeasonController;
 use App\Http\Controllers\Order\CustomerController;
@@ -56,8 +59,13 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-Route::get('/test', function () {
-    return view('test');
+Route::get('/pdf', [PdfController::class, 'index'])->name('pdf');
+Route::get('/test', function(){
+  if(extension_loaded('gd')){
+    dd('loaded');
+  }else{
+    dd('not found');
+  }
 });
 
 Route::middleware([
@@ -70,6 +78,9 @@ Route::middleware([
     })->name('dashboard');
 });
 
+Route::get('pdf/marksheet', [MarksheetController::class, 'index'])->name('marksheet');
+Route::get('pdf/marksheets', [MarksheetController::class, 'print_all_marksheet'])->name('marksheets');
+Route::get('pdf/resultsheet', [ResultsheetController::class, 'index'])->name('resultsheet');
 
 Route::prefix('sheet')->name('sheet.')->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function(){
   Route::get('/', [ResultController::class, 'index'])->name('index');
@@ -87,6 +98,8 @@ Route::prefix('result')->name('result.')->middleware(['auth:sanctum', config('je
   Route::delete('/{id}/delete', [IndexController::class, 'destroy'])->name('delete');
   Route::post('/get/form', [IndexController::class, 'get_students'])->name('get.student');
   Route::get('/get/subject', [IndexController::class, 'get_subjects'])->name('get.subject');
+  Route::get('/get/result', [ResultController::class,
+  'get_student_list'])->name('list');
 });
 
 Route::prefix('classes')->name('classes.')->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function(){

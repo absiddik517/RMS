@@ -22,12 +22,37 @@ class ResultController extends Controller
     }
     
     public function marksheet(){
-      $institute = Institute::where('language', 'bn')->first();
       $exams = Exam::select('id as value', 'name as label')->get();
       $classes = Classes::select('id as value', 'name as label')->get();
       
-      return inertia('Academic/Sheet/Marksheet', compact('exams', 'classes', 'institute'));
-      
+      return inertia('Academic/Sheet/Marksheet', compact('exams', 'classes'));
+    }
+    
+    public function get_student_list(Request $request){
+      $mappings = SubjectMapping::where('exam_id', $request->exam_id)->where('class_id', $request->class_id)->count();
+      if(!$mappings) abort(404, 'No subject mapping found for this exam.');
+      $students = Student::where('students.class_id', $request->class_id)
+                  ->join('results', function($query) use($request){
+                    $query->on('students.id', '=', 'results.student_id')
+                          ->where('results.exam_id', $request->exam_id);
+                  })
+                  ->select('students.name as student_name', 'students.roll', 'students.id')
+                  ->selectRaw('sum(results.status) as pass_count')
+                  /*->addSelect([
+                    'sum_status' => \DB::table('results')
+                          ->where('results.student_id', 'students.id')
+                          ->where('exam_id', $request->exam_id)
+                          ->selectRaw('sum(total_mark_obtain)')
+                  ])*/
+                  ->groupBy('students.name', 'students.roll', 'students.id')
+                  ->orderBy('students.roll', 'asc')
+                  ->get();
+      if($students->count() == 0) abort(404, 'No student or result found in this class');
+      return [
+        'students' => $students,
+        'total_subjects' => $mappings
+      ];
+      dd($mappings);
     }
     
     public function sheet_data(Request $request){

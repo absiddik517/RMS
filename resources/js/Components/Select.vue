@@ -49,6 +49,7 @@
 <script>
 import Multiselect from "@vueform/multiselect";
 import { random_str } from '@/Composable/functions'
+import toast from '../Store/toast';
 import axios from "axios";
 
 export default {
@@ -98,6 +99,7 @@ export default {
       raw_records: [],
       isFatching: false,
       lastFetchingQuery: null,
+      storage: {},
     };
   },
   computed: {
@@ -133,14 +135,22 @@ export default {
         for(let field in state){
           if(state[field] == '' || state[field] == null) return
         }
-        this.fetchDependedOptions();
+        if(this.isFatching) return;
+        if(this.dependOn){
+          let url = this.route(this.from, this.dependOn);
+          if(this.storage[url]){
+            this.raw_records = this.storage[url]
+            this.records = this.prepare(this.storage[url])
+          }else{
+            this.fetchDependedOptions();
+          }
+        }
       },
       deep: true,
     },
   },
   mounted() {
     this.fetchOptions(null, null, this.modelValue);
-    
   },
   methods: {
     async fetchOptions(name = "", event = null, id = undefined) {
@@ -152,7 +162,7 @@ export default {
       if (!this.from) return;
       if (this.lastFetchingQuery == form_data) return;
       this.isFatching = true
-      console.log(this.route(this.from, form_data))
+      
       await axios
         .get(`${this.route(this.from, form_data)}`)
         .then((response) => {
@@ -164,21 +174,23 @@ export default {
     },
     
     async fetchDependedOptions() {
-      console.log(this.route(this.from, this.dependOn));
-      if(!this.dependOn) return;
-      if(this.sameObject(this.lastFetchingQuery, this.dependOn)) return;
+      let url = this.route(this.from, this.dependOn);
       this.isFatching = true;
       this.$emit("update:modelValue", '');
       this.records = undefined;
-      await axios
-        .get(`${this.route(this.from, this.dependOn)}`)
-        .then((response) => {
-          this.raw_records = response.data;
-          this.records = this.prepare(response.data);
-          this.lastFetchingQuery = this.dependOn
-        });
-      this.isFatching = false;
-      console.log('dependOn called on : ' + this.labelText)
+      try{
+        const response = await axios.get(`${this.route(this.from, this.dependOn)}`)
+        this.raw_records = response.data;
+        this.records = this.prepare(response.data);
+        this.storage[url] = response.data;
+      }catch({ message }){
+        toast.add({
+          type:'error',
+          message
+        })
+      }finally{
+        this.isFatching = false;
+      }
     },
 
     prepare(result) {
@@ -193,7 +205,7 @@ export default {
         });
         return obj;
       });
-      console.log(response)
+      
       return response;
     },
     sameObject(first, secend) {
