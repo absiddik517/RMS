@@ -56,6 +56,39 @@ class ResultController extends Controller
     }
     
     public function sheet_data(Request $request){
+      try{
+        $mappings = SubjectMapping::where('exam_id', $request->exam_id)
+                    ->where('exam_subject_distributions.class_id', $request->class_id)
+                    ->join('subjects', 'exam_subject_distributions.subject_id', '=', 'subjects.id')
+                    ->select([
+                      'subjects.name', 'subjects.id'
+                    ])
+                    ->get();
+        if($mappings->count() == 0) return response()->json(['message' => 'Subjects mapping not found.'], 404);
+        
+        $results = Result::where('class_id', $request->class_id)
+                    ->where('exam_id', $request->exam_id)
+                    ->get();
+        //if($results->count() == 0) return response()->json(['message' => 'Result not found.'], 404);
+        
+        $subjects = [];
+        foreach ($mappings as $subject){
+          $subjects[] = [
+            'name' => $subject['name'],
+            'status' => $this->get_subject_status($results, $subject['id'])
+          ];
+        }
+        return $subjects;
+      }catch(\Exception $error){
+        return $error;
+      }
+    }
+    
+    private function get_subject_status($results, $subject_id){
+      return $results->where('subject_id', $subject_id)->count();
+    }
+    
+    public function sheet_data2(Request $request){
       $exam_id = $request->exam_id;
       $class_id = $request->class_id;
       $mappings = SubjectMapping::where('exam_subject_distributions.exam_id', $exam_id)

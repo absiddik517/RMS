@@ -3,13 +3,6 @@
     <div class="row">
       <div class="col-12">
         <Card varient="gray" body-class="p-0" title="Sheet" :loading="loading">
-          <template #title_right>
-            <Button @click="printSheet"><i class="fa fa-print"></i></Button>
-            &nbsp;
-            <a :href="route('resultsheet', filter)">
-              <i class="fa fa-print"></i> Pdf
-            </a>
-          </template>
           <div class="row p-2 gy-2">
             <Select
               v-model="filter.exam_id"
@@ -31,22 +24,44 @@
             />
           </div>
           
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-dark">
+                <tr>
+                  <th>#</th>
+                  <th>Subject</th>
+                  <th>Student Count</th>
+                </tr>
+              </thead>
+              <tbody v-if="data.error || loading">
+                <tr v-if="data.error && !loading">
+                  <td colspan="3" class="text-center">{{ data.error }}</td>
+                </tr>
+                <tr v-if="loading">
+                  <td colspan="3" class="text-center"><i class="fa fa-spinner fa-spin"></i></td>
+                </tr>
+              </tbody>
+              <tbody v-else>
+                <tr v-for="(subject, index) in data.subjects">
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ subject.name }}</td>
+                  <td v-if="subject.status > 0">
+                    Result found of {{ subject.status }} students
+                  </td>
+                  <td v-else>No result found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-3 text-center mb-3" v-if="!loading && !data.error && filter.exam_id && filter.class_id">
+            <a :href="route('resultsheet', filter)" target="_blank"><Pdfd :size="50"/></a>
+          </div>
         </Card>
           <div class="">
-            <div class="p-2" ref="printableArea" v-if="data.thead">
-              <div class="text-center bbwp">
-                <h1>স্কুলের নাম</h1>
-                <h3>{{ get_exam_name }}</h3>
-                <h3>{{ get_class_name }}</h3>
-              </div>
-              <div class="hiwi">width: {{ pages.width }} {{ pages.unit }}</div>
-              <div>
-                <table class="mytable" :style="{
-                '--page-width': pages.width,
-                '--page-height': pages.height,
-                '--page-margin': pages.margin,
-                '--page-unit': pages.unit,
-                }">
+            
+            <div class="p-2" ref="printableArea" v-if="false">
+              <div class="table-responsive">
+                <table class="table table-bordered">
                   <thead>
                     <tr>
                       <th rowspan="2" width="20">Roll</th>
@@ -120,18 +135,20 @@ import {
   Card,
   Button,
 } from "@/Components";
+import { Pdfd } from "@/Icons";
 import toast from "@/Store/toast.js";
 import { Inertia } from "@inertiajs/inertia";
 import { reactive, ref } from "vue";
 import jsPDF from "jspdf";
 
 export default {
-  name: "ClassBy",
+  name: "Resultsheet",
   layout: AdminLayout,
   components: {
     Spinner,
     Input,
     Select,
+    Pdfd,
     Content,
     Card,
     Button,
@@ -147,8 +164,8 @@ export default {
         exam_id: null,
       }),
       data: reactive({
-        thead: undefined,
-        result: undefined,
+        subjects: undefined,
+        error: 'Select exam and class first.',
       }),
       pages: reactive({
         width: 215.9,
@@ -167,6 +184,7 @@ export default {
       if (!this.filter.exam_id || !this.filter.class_id) return;
       try {
         this.loading = true;
+        this.data.error = null;
         console.log(
           route("sheet.data", {
             exam_id: this.filter.exam_id,
@@ -179,10 +197,9 @@ export default {
             class_id: this.filter.class_id,
           })
         );
-        this.data.thead = response.data.head;
-        this.data.result = response.data.result;
+        this.data.subjects = response.data
       } catch (error) {
-        console.log("Error on getSubjects", error);
+        this.data.error = error.response.data.message
       } finally {
         this.loading = false;
       }

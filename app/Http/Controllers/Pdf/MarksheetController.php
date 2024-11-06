@@ -72,8 +72,8 @@ class MarksheetController extends Controller
               'short_title' => $part['short_title'],
               'full_mark' => $part['full_mark'],
               'pass_mark' => $part['pass_mark'],
-              'mark_obtain' => $this->get_criteria_data(json_decode($results->where('name', $subject->name)->first()->result, true), $part['title'], 'mark_obtain'),
-              'status' => $this->get_criteria_data(json_decode($results->where('name', $subject->name)->first()->result, true), $part['title'], 'status'),
+              'mark_obtain' => $this->get_criteria_data($results->where('name', $subject->name)->first(), $part['title'], 'mark_obtain'),
+              'status' => $this->get_criteria_data($results->where('name', $subject->name)->first(), $part['title'], 'status'),
             ];
             if(!in_array($part['title'], $allCriteria)){
               $allCriteria[] = $part['title'];
@@ -82,10 +82,10 @@ class MarksheetController extends Controller
           $subjects[$subject->name] = [
             'full_mark' => $subject->full_mark,
             'short_name' => $subject->short_name,
-            'total_mark_obtain' => $results->where('name', $subject->name)->first()->total_mark_obtain,
-            'grade' => $results->where('name', $subject->name)->first()->grade,
-            'point' => $results->where('name', $subject->name)->first()->point,
-            'status' => $results->where('name', $subject->name)->first()->status,
+            'total_mark_obtain' => $results->where('name', $subject->name)->first()?->total_mark_obtain ?? 'Ab',
+            'grade' => $results->where('name', $subject->name)->first()?->grade ?? 'F',
+            'point' => $results->where('name', $subject->name)->first()?->point ?? 0.00,
+            'status' => $results->where('name', $subject->name)->first()?->status ?? 0,
             'result' => $critera,
           ];
         }
@@ -144,8 +144,8 @@ class MarksheetController extends Controller
             'short_title' => $part['short_title'],
             'full_mark' => $part['full_mark'],
             'pass_mark' => $part['pass_mark'],
-            'mark_obtain' => $this->get_criteria_data(json_decode($results->where('name', $subject->name)->first()->result, true), $part['title'], 'mark_obtain'),
-            'status' => $this->get_criteria_data(json_decode($results->where('name', $subject->name)->first()->result, true), $part['title'], 'status'),
+            'mark_obtain' => $this->get_criteria_data($results->where('name', $subject->name)->first(), $part['title'], 'mark_obtain'),
+            'status' => $this->get_criteria_data($results->where('name', $subject->name)->first(), $part['title'], 'status'),
           ];
           if(!in_array($part['title'], $allCriteria)){
             $allCriteria[] = $part['title'];
@@ -154,10 +154,10 @@ class MarksheetController extends Controller
         $subjects[$subject->name] = [
           'full_mark' => $subject->full_mark,
           'short_name' => $subject->short_name,
-          'total_mark_obtain' => $results->where('name', $subject->name)->first()->total_mark_obtain,
-          'grade' => $results->where('name', $subject->name)->first()->grade,
-          'point' => $results->where('name', $subject->name)->first()->point,
-          'status' => $results->where('name', $subject->name)->first()->status,
+          'total_mark_obtain' => $results->where('name', $subject->name)->first()?->total_mark_obtain ?? 'Ab',
+          'grade' => $results->where('name', $subject->name)->first()?->grade ?? 'F',
+          'point' => $results->where('name', $subject->name)->first()?->point ?? 0.00,
+          'status' => $results->where('name', $subject->name)->first()?->status ?? 0,
           'result' => $critera,
         ];
       }
@@ -171,7 +171,9 @@ class MarksheetController extends Controller
       ];
     }
     
-    private function get_criteria_data(Array $results, String $match, String $query){
+    private function get_criteria_data($row, String $match, String $query){
+      if(!$row) return 'Ab';
+      $results = json_decode($row->result, true);
       foreach ($results as $result){
         if($result['title'] == $match){
           return $result[$query];
@@ -186,9 +188,9 @@ class MarksheetController extends Controller
       $is_passed = 1;
       $total_full_mark = 0;
       foreach ($results as $result){
-        $total_mark += $result['total_mark_obtain'];
-        $total_full_mark += $result['full_mark'];
-        $total_points += $result['point'];
+        $total_mark += intval($result['total_mark_obtain']);
+        $total_full_mark += intval($result['full_mark']);
+        $total_points += intval($result['point']);
         $is_passed *= $result['status'];
       }
       $point = 0;

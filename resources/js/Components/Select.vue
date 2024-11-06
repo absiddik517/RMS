@@ -160,6 +160,7 @@ export default {
       if (id) form_data.id = id;
       
       if (!this.from) return;
+      console.log('called')
       if (this.lastFetchingQuery == form_data) return;
       this.isFatching = true
       

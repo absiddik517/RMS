@@ -22,20 +22,27 @@ class StoreRequest extends FormRequest
   */
   public function rules() {
     return [
-      'results.*.id' => 'nullable',
-      'results.*.student_id' => 'required',
-      'results.*.class_id' => 'required',
-      'results.*.exam_id' => 'required',
-      'results.*.subject_id' => 'required',
-      'results.*.total_mark_obtain' => 'required',
-      'results.*.point' => 'required',
-      'results.*.grade' => 'required',
-      'results.*.status' => 'required',
-      'results.*.result.*.title' => 'required',
-      'results.*.result.*.short_title' => 'required',
-      'results.*.result.*.full_mark' => 'required',
-      'results.*.result.*.mark_obtain' => 'required',
-      'results.*.result.*.status' => 'required',
+        'results.*.id' => 'nullable',
+        'results.*.appeared' => 'required|boolean',
+        'results.*.student_id' => 'required_if:results.*.appeared,true',
+        'results.*.class_id' => 'required_if:results.*.appeared,true',
+        'results.*.exam_id' => 'required_if:results.*.appeared,true',
+        'results.*.subject_id' => 'required_if:results.*.appeared,true',
+        'results.*.total_mark_obtain' => 'required_if:results.*.appeared,true',
+        'results.*.point' => 'required_if:results.*.appeared,true',
+        'results.*.grade' => 'required_if:results.*.appeared,true',
+        'results.*.status' => 'required_if:results.*.appeared,true',
+        'results.*.result.*.title' => 'required_if:results.*.appeared,true',
+        'results.*.result.*.short_title' => 'required_if:results.*.appeared,true',
+        'results.*.result.*.full_mark' => 'required_if:results.*.appeared,true',
+        'results.*.result.*.mark_obtain' => 'required_if:results.*.appeared,true',
+        'results.*.result.*.status' => 'required_if:results.*.appeared,true',
+    ];
+  }
+  
+  public function messages(){
+    return [
+      'results.*.result.*.mark_obtain.required_if' => 'Fill out this field.',
     ];
   }
 }

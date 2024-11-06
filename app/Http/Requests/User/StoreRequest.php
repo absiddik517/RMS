@@ -13,7 +13,7 @@ class StoreRequest extends FormRequest
      */
     public function authorize()
     {
-        return gate_allows('create_user');
+        return true;
     }
 
     /**

@@ -109,6 +109,14 @@
                       </template>
                     </SidebarTree>
                     
+                    <SidebarLink 
+                      name="downloads"
+                      text="Downloads"
+                      icon="fa fa-download"
+                    />
+                    
+                    
+                    <li class="nav-header">ORDER</li>
                     <SidebarTree 
                       prefix="gate"
                     >
@@ -129,141 +137,6 @@
                           name="gate.permission.index"
                           text="Permission"
                           icon="far fa-circle"
-                        />
-                      </template>
-                    </SidebarTree>
-                    
-                    <li class="nav-header">ORDER</li>
-                    <SidebarTree 
-                      prefix="order"
-                    >
-                      <template #title>
-                        <i class="nav-icon fas fa-table"></i>
-                        <p>
-                          Order
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="order.customer.index"
-                          text="Customers"
-                          icon="far fa-circle"
-                        />
-                        <SidebarLink 
-                          name="order.order.index"
-                          text="Orders"
-                          icon="far fa-circle"
-                        />
-                        <SidebarLink 
-                          name="order.customer.payment.index"
-                          text="Customer Payment"
-                          icon="far fa-circle"
-                        />
-                        <SidebarLink 
-                          name="order.product.index"
-                          text="Products"
-                          icon="far fa-circle"
-                        />
-                      </template>
-                    </SidebarTree>
-                    
-                    <SidebarTree prefix="order.delivery">
-                      <template #title>
-                        <i class="nav-icon fas fa-truck"></i>
-                        <p>
-                          Delivery
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="order.delivery.create"
-                          text="Create Delivery"
-                          icon="fa fa-plus"
-                        />
-                        <SidebarLink 
-                          name="order.delivery.index"
-                          text="Deliveries"
-                          icon="far fa-circle"
-                        />
-                      </template>
-                    </SidebarTree>
-                    
-                    <SidebarTree prefix="order.refund">
-                      <template #title>
-                        <i class="nav-icon fas fa-truck"></i>
-                        <p>
-                          Refund
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="order.refund.index"
-                          text="Index"
-                          icon="fa fa-list"
-                        />
-                        <SidebarLink 
-                          name="order.refund.create"
-                          text="Create"
-                          icon="far fa-circle"
-                        />
-                      </template>
-                    </SidebarTree>
-                    
-                    <SidebarTree prefix="admin.dashboard">
-                      <template #title>
-                        <i class="nav-icon fas fa-user"></i>
-                        <p>
-                          Expense
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="expense.create"
-                          text="Create cost"
-                          icon="fa fa-plus"
-                        />
-                        <SidebarLink 
-                          name="expense.index"
-                          text="Costs"
-                          icon="fa fa-list"
-                        />
-                      </template>
-                    </SidebarTree>
-                    
-                    <li class="nav-header">PEOPLES</li>
-                    <SidebarTree prefix="worker">
-                      <template #title>
-                        <i class="nav-icon fas fa-user"></i>
-                        <p>
-                          Worker
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="worker.index"
-                          text="Workers"
-                          icon="fa fa-list"
-                        />
-                      </template>
-                    </SidebarTree>
-                    <SidebarTree prefix="staff">
-                      <template #title>
-                        <i class="nav-icon fas fa-user"></i>
-                        <p>
-                          Staff
-                          <i class="fas fa-angle-left right"></i>
-                        </p>
-                      </template>
-                      <template #links>
-                        <SidebarLink 
-                          name="staff.index"
-                          text="Staffs"
-                          icon="fa fa-list"
                         />
                       </template>
                     </SidebarTree>
@@ -289,14 +162,6 @@
                         />
                       </template>
                     </SidebarTree>
-                    
-                    <li class="nav-header">MISCELLANEOUS</li>
-                    <li class="nav-item">
-                        <inertia-link :href="route('dashboard')" class="nav-link">
-                            <i class="nav-icon fas fa-home"></i>
-                            <p>Site</p>
-                        </inertia-link>
-                    </li>
                     
                     <li class="nav-item">
                       <form @submit.prevent="submit">

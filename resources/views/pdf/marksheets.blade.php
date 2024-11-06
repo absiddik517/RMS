@@ -129,7 +129,7 @@
                   শ্রেণি: <strong> {{ $student['student']['class'] }}</strong>
                 </td>
                 <td style="width: 33.33%; text-align: right;">রোল নং: 
-                <strong>{{ $student['student']['roll'] }}</strong></td>
+                <strong>{{ bnum($student['student']['roll']) }}</strong></td>
             </tr>
         </table>
         <table class="marks-table">
@@ -148,14 +148,14 @@
               @foreach($student['subjects'] as $name => $subject)
                 <tr @if(!$subject['status']) style="background:
                 rgba(0,0,0,0.149);" @endif>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ bnum($loop->iteration) }}</td>
                     <td style="text-align:left;">{{ $name }}</td>
-                    <td>{{ $subject['full_mark'] }}</td>
+                    <td>{{ bnum($subject['full_mark']) }}</td>
                     @foreach($theads as $title)
                       @if(isset($subject['result'][$title]))
                         <td @if(!$subject['result'][$title]['status'])
                         style="color: red;" @endif>{{
-                        $subject['result'][$title]['mark_obtain'] }} </td>
+                        bnum($subject['result'][$title]['mark_obtain']) }} </td>
                       @else
                         <td>-</td>
                       @endif
@@ -166,16 +166,16 @@
                       style="color:red"
                       @endif
                     >
-                      {{ $subject['total_mark_obtain'] }}
+                      {{ bnum($subject['total_mark_obtain']) }}
                     </td>
                     <td>{{ $subject['grade'] }}</td>
                 </tr>
                 @endforeach
                 <tr>
                     <td colspan="2" class="total-label">মোট</td>
-                    <td>{{ $student['result']['total_full_mark'] }}</td>
+                    <td>{{ bnum($student['result']['total_full_mark']) }}</td>
                     <td colspan="{{ count($theads) + 1 }}"
-                    style="text-align:right">{{ $student['result']['total_marks'] }}</td>
+                    style="text-align:right">{{ bnum($student['result']['total_marks']) }}</td>
                     <td></td>
                 </tr>
             </tbody>
@@ -185,9 +185,9 @@
             <tr>
                 <td style="width: 33.33%">গ্রেড: {{ $student['result']['grade'] }}</td>
                 <td style="text-align:center; width:33.33%">GPA: {{
-                round($student['result']['point'], 2) }}</td>
+                bnum(round($student['result']['point'], 2)) }}</td>
                 <td style="text-align:right; width: 33.33%">শতকরা: {{
-                round($student['result']['percent'], 0) }}%</td>
+                bnum(round($student['result']['percent'], 0)) }}%</td>
             </tr>
         </table>
         <div class="comment">

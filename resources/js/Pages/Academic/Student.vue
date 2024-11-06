@@ -153,7 +153,7 @@
         <Select
           v-model="form.class_id"
           label-text="Class"
-          :options="classes"
+          from="exam.get.select"
         />
         <Input v-model="form.roll" field="roll" label="Roll" :form="form" />
         <Input v-model="form.name" field="name" label="Name" :form="form" />

@@ -40,6 +40,8 @@ class ResultsheetController extends Controller
                     'class_name' => \DB::table('classes')->where('id', $req->class_id)->select('name'),
                   ])
                   ->first();
+      if(!$institute) abort(403, 'Institute not found, Set it first.');
+      
       $mappings = SubjectMapping::where('exam_subject_distributions.class_id', $req->class_id)
                 ->where('exam_subject_distributions.exam_id', $req->exam_id)
                 ->join('subjects', 'subjects.id', '=', 'exam_subject_distributions.subject_id')
@@ -50,13 +52,13 @@ class ResultsheetController extends Controller
                   'subjects.short_name'
                 ])
                 ->get();
-      if(!$mappings) abort(404, 'Subject mapping not found for this class');
+      if($mappings->count() == 0) abort(403, 'Subject mapping not found for this class');
       $students = Student::where('students.class_id', $req->class_id)
                   ->select('name', 'roll', 'id')
                   ->orderBy('students.id', 'asc')
                   ->get();
                   
-      if(!$students) abort(404, 'Student not found for this class');
+      if($students->count() == 0) abort(403, 'Student not found for this class');
       $results = Result::where('exam_id', $req->exam_id)
                   ->where('class_id', $req->class_id)
                   ->select([
@@ -64,7 +66,7 @@ class ResultsheetController extends Controller
                     'grade', 'status', 'result'
                   ])
                   ->get();
-      if(!$results) abort(404, 'Result not found for this class');
+      if($results->count() == 0) abort(403, 'Result not found for this class');
       
       // create a subject array with criteria
       $subjects = [];
@@ -92,18 +94,32 @@ class ResultsheetController extends Controller
         $temp_subject_result = [];
         foreach ($subjects as $subject_name => $subject){
           $student_result = $results->where('student_id', $student->id)->where('subject_id', $subject['id'])->first();
-          $result_criteria = json_decode($student_result->result, true);
-          $temp_subject_result[$subject_name] = [
-            ...$subjects[$subject_name],
-            'total_mark_obtain' => $student_result->total_mark_obtain,
-            'status' => $student_result->status,
-            'grade' => $student_result->grade,
-            'point' => $student_result->point,
-          ];
-          
-          foreach ($temp_subject_result[$subject_name]['criteria'] as $short_title => $item){
-            $temp_subject_result[$subject_name]['criteria'][$short_title]['mark_obtain'] = $this->get_result_parts('short_title', $short_title, 'mark_obtain', $result_criteria);
-            $temp_subject_result[$subject_name]['criteria'][$short_title]['status'] = $this->get_result_parts('short_title', $short_title, 'status', $result_criteria);
+          if($student_result){
+            $result_criteria = json_decode($student_result->result, true);
+            $temp_subject_result[$subject_name] = [
+              ...$subjects[$subject_name],
+              'total_mark_obtain' => $student_result->total_mark_obtain,
+              'status' => $student_result->status,
+              'grade' => $student_result->grade,
+              'point' => $student_result->point,
+            ];
+            
+            foreach ($temp_subject_result[$subject_name]['criteria'] as $short_title => $item){
+              $temp_subject_result[$subject_name]['criteria'][$short_title]['mark_obtain'] = $this->get_result_parts('short_title', $short_title, 'mark_obtain', $result_criteria);
+              $temp_subject_result[$subject_name]['criteria'][$short_title]['status'] = $this->get_result_parts('short_title', $short_title, 'status', $result_criteria);
+            }
+          }else{
+            $temp_subject_result[$subject_name] = [
+              ...$subjects[$subject_name],
+              'total_mark_obtain' => 'Ab',
+              'status' => 0,
+              'grade' => 'F',
+              'point' => 0,
+            ];
+            foreach ($subjects[$subject_name]['criteria'] as $short_title => $k){
+              $temp_subject_result[$subject_name]['criteria'][$short_title]['mark_obtain'] = 'Ab';
+              $temp_subject_result[$subject_name]['criteria'][$short_title]['status'] = 0;
+            }
           }
         }
         $students_array[] = [
@@ -139,9 +155,9 @@ class ResultsheetController extends Controller
       $total_number = 0;
       $total_point = 0;
       foreach ($subjects as $subject){
-        $is_passed *= $subject['status'];
-        $total_number += $subject['total_mark_obtain'];
-        $total_point += $subject['point'];
+        $is_passed *= intval($subject['status']);
+        $total_number += intval($subject['total_mark_obtain']);
+        $total_point += intval($subject['point']);
       }
       if($is_passed){
         $point = round($total_point/$total_subjects, 2);

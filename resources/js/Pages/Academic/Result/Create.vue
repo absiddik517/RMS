@@ -20,32 +20,37 @@
             from="result.get.subject" 
             :depend-on="{class_id: form.class_id}"
             @change="getForm"/>
-          <div class="row">
+          <div class="row" v-if="form.results.length">
             <div class="col-md-4" v-for="(item, index) in form.results" :key="'index'+index">
               <div class="contain">
-                <h4 :class="{'failed' : form.results[index].grade
-                    === 'F', 'passed': form.results[index].grade !== 'F'}">{{ item.roll }}.
-                {{ item.student_name }}</h4>
+                <div class="form-check form-switch mb-2">
+                  <input tabindex="-1" v-model="item.appeared" class="form-check-input" type="checkbox" :id="`flexSwitchCheckDefault_${index}_id`">
+                  <label class="form-check-label" :for="`flexSwitchCheckDefault_${index}_id`" :class="{'failed' : form.results[index].grade
+                    === 'F', 'passed': form.results[index].grade !== 'F'}">
+                    {{ item.roll }}. {{ item.student_name }}
+                    <i v-if="item.id" class="fa fa-pencil"></i>
+                  </label>
+                </div>
                 <div class="row">
                   <div class="col-md-4 col-xs-6 col-sm-6" v-for="(row, ind) in item.result" :key="'result'+ind">
                     <input 
+                      :disabled="!item.appeared"
                       class="form-control mb-2"
+                      :class="{'has-errors': form?.errors[`results.${index}.result.${ind}.mark_obtain`]}"
                       v-model="form.results[index].result[ind].mark_obtain"
                       :placeholder="row.pass_mark+' < '+row.short_title + ' < ' + row.full_mark" 
                       type="number"
                       :max="row.full_mark"
                       @input="handel_mark_change(index, ind)"
                     />
+                    <span v-if="form?.errors[`results.${index}.result.${ind}.mark_obtain`]" class="error-message">{{ form?.errors[`results.${index}.result.${ind}.mark_obtain`] }}</span>
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-4">
+                  <div class="col-6">
                     Total: {{ form.results[index].total_mark_obtain }}
                   </div>
-                  <div class="col-4 text-center">
-                  
-                  </div>
-                  <div class="col-4 text-right">
+                  <div class="col-6 text-right">
                     Grade: <span :class="{'failed' : form.results[index].grade === 'F', 'passed': form.results[index].grade !== 'F'}">{{ form.results[index].grade }}</span>
                   </div>
                 </div>
@@ -59,6 +64,9 @@
             </Button>
           </div>
         </form>
+        <div>
+          <pre>{{ form }}</pre>
+        </div>
       </div>
     </Card>
   </Content>
@@ -151,18 +159,21 @@ export default {
       this.loaded = false;
       this.form.results = []
       try {
-        const response = await axios.post(route('result.get.student'), {
+        let url = route('result.get.student', {
           exam_id: this.form.exam_id,
           class_id: this.form.class_id,
           subject_id: this.form.subject_id
         });
+        console.log(url)
+        const response = await axios.get(url);
         this.form.results = response.data;
         this.loaded = true;
         console.log(response)
-      } catch ({ message }) {
+      } catch (error) {
+        console.log(error)
         toast.add({
           type: 'error',
-          message
+          message: error.response.data.message
         })
       } finally {
         this.loading = false;
@@ -208,7 +219,7 @@ export default {
       }else {
           return (isGrade) ? 'F' : 0;
       }
-  }
+    }
   }
   
 }
@@ -228,6 +239,20 @@ export default {
   .failed {
     color: red;
     font-weight: bold;
+  }
+  
+  .has-errors{
+    margin-bottom: 0!important;
+    border-color: red;
+  }
+  
+  .error-message{
+    font-weight: bold;
+    color:red;
+  }
+  
+  .form-check {
+    margin-left: 20px!important;
   }
   
 </style>

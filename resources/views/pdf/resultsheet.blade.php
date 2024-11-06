@@ -133,17 +133,17 @@
             <tbody>
               @foreach($students as $student)
                 <tr>
-                  <td>{{ $student['roll'] }}</td>
-                  <td>{{ $student['name'] }}</td>
+                  <td>{{ bnum($student['roll']) }}</td>
+                  <td style="text-align:left;">{{ $student['name'] }}</td>
                   @foreach($student['result'] as $subject)
                     @foreach($subject['criteria'] as $item)
-                      <td> {{ $item['mark_obtain'] }}</td>
+                      <td> {{ bnum($item['mark_obtain']) }}</td>
                     @endforeach
-                    <td>{{ $subject['total_mark_obtain'] }}</td>
+                    <td>{{ bnum($subject['total_mark_obtain']) }}</td>
                   @endforeach
-                  <td>{{ $student['total'] }}</td>
+                  <td>{{ bnum($student['total']) }}</td>
                   <td>{{ $student['grade'] }}</td>
-                  <td>{{ $student['point'] }}</td>
+                  <td>{{ bnum($student['point']) }}</td>
                 </tr>
               @endforeach
             </tbody>

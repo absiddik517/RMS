@@ -20,17 +20,3 @@ use App\Http\Controllers\Api\Staff\PaymentController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::middleware('')->group(function () {
-    Route::get('/users-list', [UserController::class, 'get']);
-});
-
-Route::prefix('staff')->name('api.staff.')->group(function() {
-  Route::get('/payments', [StaffController::class, 'payments'])->name('payments');
-  Route::get('/seleries', [StaffController::class, 'seleries'])->name('seleries');
-  
-  Route::prefix('payment')->name('payment.')->group(function(){
-    Route::post('store', [PaymentController::class, 'store'])->name('store');
-    Route::post('update', [PaymentController::class, 'update'])->name('update');
-  });
-});
