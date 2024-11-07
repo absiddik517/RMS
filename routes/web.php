@@ -60,10 +60,11 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::get('pdf/marksheet', [MarksheetController::class, 'index'])->name('marksheet');
-Route::get('pdf/marksheets', [MarksheetController::class, 'print_all_marksheet'])->name('marksheets');
-Route::get('pdf/resultsheet', [ResultsheetController::class, 'index'])->name('resultsheet');
+Route::get('downloads/marksheet', [MarksheetController::class, 'index'])->name('marksheet');
+Route::get('downloads/marksheets', [MarksheetController::class, 'print_all_marksheet'])->name('marksheets');
+Route::get('downloads/resultsheet', [ResultsheetController::class, 'index'])->name('resultsheet');
 Route::get('downloads/result-form', [DownloadController::class, 'result_entry_sheet'])->name('pdf.result.form');
+Route::get('downloads/exam/plan/{exam_id}', [DownloadController::class, 'new_exam_plan'])->name('pdf.exam.form');
 
 Route::get('downloads', function(){
   $exams = \DB::table('exams')->select('name', 'id')->get();

@@ -18,21 +18,37 @@ use App\Http\Resources\Academic\SubjectMappingResource;
 class SubjectMappingController extends Controller
 {
     use Filter;
-    public function index(){
-      $data =
-      DB::table('exam_subject_distributions')
-      ->join('exams', 'exam_subject_distributions.exam_id', '=', 'exams.id')
-      ->join('subjects', 'exam_subject_distributions.subject_id', '=', 'subjects.id')
-      ->join('classes', 'exam_subject_distributions.class_id', '=', 'classes.id')
-        ->select([
-          'exam_subject_distributions.id',
-          'exam_subject_distributions.full_mark',
-          'exam_subject_distributions.criteria',
-          'exams.name as exam_name',
-          'subjects.name as subject_name',
-          'classes.name as class_name'
-        ])->paginate();
-      $subjectmappings = SubjectMappingResource::collection($data);
+    public function index(Request $req){
+      $exams = Exam::with('mappings')
+              ->where(function($q) use ($req) {
+                  if ($req->has('search')) {
+                      $q->where('name', 'like', '%' . $req->search . '%');
+                  }
+              })
+              ->get();
+      $classes = Classes::select('id', 'name')
+                  ->get();
+      $data = [];
+      foreach ($exams as $exam){
+        foreach ($classes as $class){
+          $subjects = $exam->mappings?->where('class_id', $class->id);
+          $tempsub = [];
+          if($subjects->count() > 0){
+            foreach ($subjects as $subject){
+              $tempsub[$subject->subject->name] = [
+                'full_mark' => $subject->full_mark,
+                'criteria' => json_decode($subject->criteria, true),
+              ];
+            }
+            $data[] = [
+              'exam' => $exam->name,
+              'class' => $class->name,
+              'subjects' => $tempsub,
+            ];
+          }
+        }
+      }
+      $subjectmappings = $data;
       $params = $this->getParams();
       return inertia('Academic/SubjectMapping', compact('subjectmappings',
       'params'));

@@ -17,6 +17,18 @@
                   <a :href="route('pdf.result.form', {exam_id: filter.exam_id})" target="_blank"><Pdfd /></a>
                 </td>
               </tr>
+              <tr>
+                <td>Exam plan</td>
+                <td style="width: 40%;">
+                  <select class="form-control" v-model="filter.exam_id">
+                    <option value="">Exam</option>
+                    <option v-for="exam in exams" :value="exam.id"> {{ exam.name }} </option>
+                  </select>
+                </td>
+                <td class="text-right" style="width: 40px;">
+                  <a :href="route('pdf.exam.form', {exam_id: filter.exam_id})" target="_blank"><Pdfd /></a>
+                </td>
+              </tr>
             </tbody>
           </table>
         </Card>
